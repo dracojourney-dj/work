@@ -772,12 +772,16 @@ const routes = {
   "#/achievements": renderAchievements,
 };
 function route() {
-  const hash = location.hash || (state.user ? "#/dashboard" : "#/auth");
-  // auth gate
-  if (!state.user && hash !== "#/auth" && hash !== "") {
-    location.hash = "#/auth";
-    return;
+  // 暂时跳过登录页：以游客身份直接进入应用，后期可在 #/auth 重新启用
+  if (!state.user) {
+    state.user = { name: "学习者", email: "", langs: ["en", "ja", "ko"], joinedAt: Date.now(), guest: true };
+    if (state.history.length === 0) {
+      state.history.push({ date: todayStr() });
+      state.streak = { count: 1, last: todayStr() };
+    }
+    saveState();
   }
+  const hash = location.hash === "#/auth" ? "#/dashboard" : (location.hash || "#/dashboard");
   const [path, query] = hash.split("?");
   const fn = routes[path] || renderDashboard;
   document.body.classList.remove("view-pg");
