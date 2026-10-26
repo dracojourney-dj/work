@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>24 点 · 真实纸牌</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <h1>🎴 24 点</h1>
+    <p class="sub">用发下的 <b>四张牌</b>，通过 <b>+ − × ÷</b> 与括号凑出 <b>24</b>。每张牌都要用到，且仅用一次。</p>
+    <div class="scoreboard">
+      <span>连胜 <b id="streak">0</b></span>
+      <span>成功 <b id="wins">0</b></span>
+      <span>失败 <b id="losses">0</b></span>
+      <span>提示 <b id="hints">0</b></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="deck-wrap">
+      <div id="cards" class="cards"></div>
+    </section>
+
+    <section class="input-wrap">
+      <label for="expr">输入你的算式</label>
+      <div class="expr-row">
+        <input id="expr" type="text" placeholder="例如 (3+3)*(5-1) 或 10*2+8-4" autocomplete="off" spellcheck="false" />
+        <button id="btn-voice" class="voice" title="语音输入算式" aria-label="语音输入算式" aria-pressed="false">🎤</button>
+        <button id="btn-check" class="primary">提交</button>
+      </div>
+      <div class="kbd-row" id="kbd-row">
+        <button class="kbd" data-val="+">+</button>
+        <button class="kbd" data-val="-">−</button>
+        <button class="kbd" data-val="*">×</button>
+        <button class="kbd" data-val="/">÷</button>
+        <button class="kbd" data-val="(">(</button>
+        <button class="kbd" data-val=")">)</button>
+        <button class="kbd" data-val="back">⌫</button>
+      </div>
+      <div id="msg" class="msg" aria-live="polite"></div>
+    </section>
+
+    <section class="actions">
+      <button id="btn-deal" class="ghost">🔀 换一手</button>
+      <button id="btn-hint" class="ghost">💡 给点提示</button>
+      <button id="btn-answer" class="ghost">🧠 看答案</button>
+      <button id="btn-reset" class="ghost">♻️ 清零战绩</button>
+    </section>
+
+    <section class="rules">
+      <details>
+        <summary>规则 · 牌面取值</summary>
+        <ul>
+          <li>A = 1，2–10 = 面值，J / Q / K = 10（经典"凑 24"规则）。</li>
+          <li>支持小数中间结果，例如 <code>3÷(1−5÷6)=24</code>。</li>
+          <li>若一手牌无解，点「换一手」即可；或按「看答案」查看（无解会提示）。</li>
+          <li>输入中请使用 <code>*</code> 表示乘，<code>/</code> 表示除。</li>
+          <li>🎤 语音输入：点麦克风后直接念算式，如「三加三乘以五减一」，会自动转成 <code>(3+3)*(5-1)</code>。需要 Chrome / Edge / Safari 并允许麦克风权限。</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 id="modal-title">🎉 太棒了！</h2>
+      <p id="modal-body"></p>
+      <div class="modal-actions">
+        <button id="modal-next" class="primary">再来一手</button>
+        <button id="modal-close" class="ghost">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="solver.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

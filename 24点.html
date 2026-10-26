@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>24 点 · 真实纸牌</title>
+<style>
+/* ========== 基础风格 ========== */
+:root {
+  --bg: #0f5132;          /* 扑克桌绿 */
+  --bg2: #0b3d26;
+  --felt: repeating-radial-gradient(circle at 50% 40%, #116b3f 0, #0b3d26 60%);
+  --card-bg: #fffdf6;
+  --card-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255,255,255,.05) inset;
+  --red: #d42626;
+  --black: #111;
+  --gold: #ffd87a;
+  --primary: #ffd87a;
+  --primary-text: #3a2a00;
+  --muted: rgba(255,255,255,.7);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+               "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  color: #fff;
+  background: radial-gradient(1200px 600px at 50% -20%, #1b7a4a 0%, var(--bg) 55%, var(--bg2) 100%);
+  min-height: 100vh;
+  padding: 24px 16px 80px;
+}
+
+.hero { text-align: center; margin-bottom: 18px; }
+.hero h1 {
+  margin: 0; font-size: clamp(28px, 5vw, 42px);
+  letter-spacing: 2px;
+  text-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+.hero .sub { color: var(--muted); margin: 6px 0 14px; }
+.hero .sub b { color: var(--gold); }
+
+.scoreboard {
+  display: flex; gap: 18px; justify-content: center;
+  color: var(--muted); font-size: 14px;
+}
+.scoreboard b { color: var(--gold); font-variant-numeric: tabular-nums; }
+
+/* ========== 主体布局 ========== */
+main {
+  max-width: 720px; margin: 0 auto;
+  display: grid; gap: 22px;
+}
+
+/* ========== 牌桌 ========== */
+.deck-wrap {
+  padding: 28px 12px 30px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.05), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.14)),
+    var(--felt);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,216,122,.25),
+    0 12px 30px rgba(0,0,0,.25);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  justify-items: center;
+  perspective: 1200px;
+}
+
+/* ========== 真实扑克牌样式 ========== */
+.card {
+  --w: min(22vw, 130px);
+  width: var(--w);
+  aspect-ratio: 2.5 / 3.5;
+  background: var(--card-bg);
+  color: var(--black);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  position: relative;
+  padding: 10px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  animation: dealIn .5s cubic-bezier(.2,.8,.2,1) both;
+  transform-style: preserve-3d;
+}
+.card.red { color: var(--red); }
+.card.back {
+  background:
+    repeating-linear-gradient(45deg, #0f3a7a 0 6px, #1a4ea0 6px 12px),
+    linear-gradient(135deg, #0f3a7a, #1a4ea0);
+  color: transparent;
+  box-shadow: 0 6px 14px rgba(0,0,0,.45);
+}
+.card .corner {
+  display: flex; flex-direction: column; align-items: center; line-height: 1;
+  font-weight: 700;
+  font-size: calc(var(--w) * 0.18);
+}
+.card .corner .suit { font-size: calc(var(--w) * 0.22); margin-top: 2px; }
+.card .corner.br { align-self: flex-end; transform: rotate(180deg); }
+.card .pip {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: calc(var(--w) * 0.65);
+  font-weight: 700;
+}
+.card.jqk .pip {
+  font-size: calc(var(--w) * 0.18);
+  font-family: "Georgia", "STSong", serif;
+  font-weight: 400;
+  letter-spacing: 2px;
+}
+.card.jqk .pip::before { content: attr(data-label); }
+
+@keyframes dealIn {
+  from { opacity: 0; transform: translateY(40px) rotate(-8deg) scale(.9); }
+  to   { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
+}
+.card:nth-child(1) { animation-delay: .05s; }
+.card:nth-child(2) { animation-delay: .15s; }
+.card:nth-child(3) { animation-delay: .25s; }
+.card:nth-child(4) { animation-delay: .35s; }
+
+/* ========== 输入区 ========== */
+.input-wrap {
+  background: rgba(0,0,0,.25);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 16px;
+}
+.input-wrap label { color: var(--muted); font-size: 13px; }
+.expr-row { display: flex; gap: 10px; margin-top: 8px; }
+.expr-row input {
+  flex: 1;
+  font: inherit;
+  font-size: 18px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  outline: none;
+  transition: border-color .15s, background .15s;
+}
+.expr-row input:focus { border-color: var(--gold); background: rgba(255,255,255,.14); }
+.expr-row input.error { border-color: #ff6b6b; }
+
+.primary {
+  font: inherit;
+  background: var(--primary);
+  color: var(--primary-text);
+  font-weight: 700;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform .05s ease, box-shadow .15s;
+  box-shadow: 0 6px 14px rgba(0,0,0,.25);
+}
+.primary:active { transform: translateY(1px); }
+
+/* ========== 语音输入按钮 ========== */
+.voice {
+  flex: 0 0 auto;
+  width: 48px;
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  color: #fff;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+}
+.voice:hover { background: rgba(255,255,255,.22); }
+.voice:active { transform: translateY(1px); }
+.voice.listening {
+  background: var(--red);
+  border-color: #ff8a8a;
+  animation: micPulse 1.1s ease-in-out infinite;
+}
+.voice.unsupported { opacity: .45; }
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212,38,38,.65); }
+  50%      { box-shadow: 0 0 0 9px rgba(212,38,38,0); }
+}
+
+.kbd-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 12px; }
+.kbd {
+  font: inherit;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.18);
+  padding: 10px 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.kbd:hover { background: rgba(255,255,255,.22); }
+.kbd:active { transform: translateY(1px); }
+
+.msg {
+  min-height: 22px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.msg.ok { color: #8fffa4; }
+.msg.err { color: #ff9a9a; }
+.msg.info { color: var(--gold); }
+
+/* ========== 动作按钮 ========== */
+.actions {
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+}
+.ghost {
+  font: inherit;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.ghost:hover { background: rgba(255,255,255,.18); }
+
+/* ========== 规则 ========== */
+.rules { margin-top: 8px; }
+.rules details { background: rgba(0,0,0,.18); border-radius: 10px; padding: 10px 14px; }
+.rules summary { cursor: pointer; color: var(--muted); }
+.rules ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+.rules code { background: rgba(255,255,255,.1); padding: 1px 5px; border-radius: 4px; }
+
+/* ========== 弹窗 ========== */
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal.hidden { display: none; }
+.modal-card {
+  background: #1b1b1b;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  padding: 22px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+.modal-card h2 { margin: 0 0 8px; }
+.modal-card p { color: var(--muted); margin: 0 0 16px; line-height: 1.6; }
+.modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+@media (max-width: 480px) {
+  .card { --w: min(22vw, 120px); }
+  .scoreboard { gap: 10px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+  <header class="hero">
+    <h1>🎴 24 点</h1>
+    <p class="sub">用发下的 <b>四张牌</b>，通过 <b>+ − × ÷</b> 与括号凑出 <b>24</b>。每张牌都要用到，且仅用一次。</p>
+    <div class="scoreboard">
+      <span>连胜 <b id="streak">0</b></span>
+      <span>成功 <b id="wins">0</b></span>
+      <span>失败 <b id="losses">0</b></span>
+      <span>提示 <b id="hints">0</b></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="deck-wrap">
+      <div id="cards" class="cards"></div>
+    </section>
+
+    <section class="input-wrap">
+      <label for="expr">输入你的算式</label>
+      <div class="expr-row">
+        <input id="expr" type="text" placeholder="例如 (3+3)*(5-1) 或 10*2+8-4" autocomplete="off" spellcheck="false" />
+        <button id="btn-voice" class="voice" title="语音输入算式" aria-label="语音输入算式" aria-pressed="false">🎤</button>
+        <button id="btn-check" class="primary">提交</button>
+      </div>
+      <div class="kbd-row" id="kbd-row">
+        <button class="kbd" data-val="+">+</button>
+        <button class="kbd" data-val="-">−</button>
+        <button class="kbd" data-val="*">×</button>
+        <button class="kbd" data-val="/">÷</button>
+        <button class="kbd" data-val="(">(</button>
+        <button class="kbd" data-val=")">)</button>
+        <button class="kbd" data-val="back">⌫</button>
+      </div>
+      <div id="msg" class="msg" aria-live="polite"></div>
+    </section>
+
+    <section class="actions">
+      <button id="btn-deal" class="ghost">🔀 换一手</button>
+      <button id="btn-hint" class="ghost">💡 给点提示</button>
+      <button id="btn-answer" class="ghost">🧠 看答案</button>
+      <button id="btn-reset" class="ghost">♻️ 清零战绩</button>
+    </section>
+
+    <section class="rules">
+      <details>
+        <summary>规则 · 牌面取值</summary>
+        <ul>
+          <li>A = 1，2–10 = 面值，J / Q / K = 10（经典"凑 24"规则）。</li>
+          <li>支持小数中间结果，例如 <code>3÷(1−5÷6)=24</code>。</li>
+          <li>若一手牌无解，点「换一手」即可；或按「看答案」查看（无解会提示）。</li>
+          <li>输入中请使用 <code>*</code> 表示乘，<code>/</code> 表示除。</li>
+          <li>🎤 语音输入：点麦克风后直接念算式，如「三加三乘以五减一」，会自动转成 <code>(3+3)*(5-1)</code>。需要 Chrome / Edge / Safari 并允许麦克风权限。</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2 id="modal-title">🎉 太棒了！</h2>
+      <p id="modal-body"></p>
+      <div class="modal-actions">
+        <button id="modal-next" class="primary">再来一手</button>
+        <button id="modal-close" class="ghost">关闭</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================================================
+ * solver.js —— 24 点求解器 + 玩家表达式校验
+ * =========================================================
+ * 思路：递归地从一组数里挑两个，用 + − × ÷ 合并，
+ * 剩下的继续合并，直到只剩一个数。每次合并的顺序
+ * 自动覆盖所有括号结构。使用分数精确计算，避免浮点误差。
+ * ========================================================= */
+
+(function (global) {
+  'use strict';
+
+  /* ---------- 分数（有理数），保证计算精确 ---------- */
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a; }
+  function F(num, den) {
+    den = den === undefined ? 1 : den;
+    if (den === 0) return null;
+    if (den < 0) { num = -num; den = -den; }
+    const g = gcd(num, den) || 1;
+    return { n: num / g, d: den / g };
+  }
+  function Fadd(a, b) { return F(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Fsub(a, b) { return F(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Fmul(a, b) { return F(a.n * b.n, a.d * b.d); }
+  function Fdiv(a, b) { if (b.n === 0) return null; return F(a.n * b.d, a.d * b.n); }
+  function Feq24(f) { return f && f.n === 24 * f.d; }
+  function FtoFloat(f) { return f.n / f.d; }
+
+  /* ---------- 格式化分数 ---------- */
+  function fmtF(f) {
+    if (!f) return '';
+    if (f.d === 1) return String(f.n);
+    return f.n + '/' + f.d;
+  }
+
+  /* ---------- 求解 ----------
+   * cards: [{ value, label, suit }, ...] 长度 4
+   * options.target 默认 24
+   * 返回：[{ expr: '...', tokens: [...] }]  所有不同的解（最多返回前 N 个）
+   */
+  function solve24(cards, options) {
+    options = options || {};
+    const target = options.target !== undefined ? options.target : 24;
+    const MAX_ANSWERS = options.maxAnswers || 20;
+    const results = [];
+    const seen = new Set(); // 去重
+
+    // 初始状态：每张牌的数值 + 原标签（用于生成人类可读的表达式）
+    const init = cards.map(c => ({
+      f: F(c.value, 1),
+      expr: c.label,            // 例如 'A' / '10' / 'K'
+      token: c.label,
+      val: c.value,
+    }));
+
+    const PRIO = { '+': 1, '-': 1, '*': 2, '/': 2 };
+
+    // 判断某个子表达式（prio=子算子）作为父 op 的左/右操作数时是否需要括号
+    function needParen(parentOp, childPrio, isRight) {
+      if (childPrio === undefined) return false;     // 叶子节点，没有括号
+      const pp = PRIO[parentOp], cp = PRIO[childPrio];
+      if (cp < pp) return true;                      // 子优先级更低，一定加
+      if (cp === pp) {
+        // 同级左结合，右操作数若为同级则改变了结合性
+        if (parentOp === '-') return true;           // a - (b +- c)
+        if (parentOp === '/') return true;           // a / (b */ c) 全部同级都要
+      }
+      return false;
+    }
+
+    function combineTwo(a, b, op) {
+      let f;
+      switch (op) {
+        case '+': f = Fadd(a.f, b.f); break;
+        case '-': f = Fsub(a.f, b.f); break;
+        case '*': f = Fmul(a.f, b.f); break;
+        case '/': f = Fdiv(a.f, b.f); break;
+      }
+      if (!f) return null;
+
+      let ea = a.expr, eb = b.expr;
+      if (needParen(op, a.prio, false)) ea = '(' + ea + ')';
+      if (needParen(op, b.prio, true))  eb = '(' + eb + ')';
+
+      return { f, expr: ea + ' ' + op + ' ' + eb, prio: op, token: null, val: null };
+    }
+
+    function rec(list) {
+      if (results.length >= MAX_ANSWERS) return;
+      if (list.length === 1) {
+        if (Feq24(list[0].f)) {
+          const key = list[0].expr.replace(/\s+/g, '');
+          if (!seen.has(key)) { seen.add(key); results.push({ expr: list[0].expr }); }
+        }
+        return;
+      }
+      // 挑两个不同下标
+      for (let i = 0; i < list.length; i++) {
+        for (let j = 0; j < list.length; j++) {
+          if (i === j) continue;
+          const rest = [];
+          for (let k = 0; k < list.length; k++) if (k !== i && k !== j) rest.push(list[k]);
+          const a = list[i], b = list[j];
+          const ops = ['+', '-', '*', '/'];
+          for (const op of ops) {
+            // 对称操作去重：a+b 和 b+a 是同一个
+            if ((op === '+' || op === '*') && i > j) continue;
+            const combo = combineTwo(a, b, op);
+            if (!combo) continue;
+            rec([...rest, combo]);
+            if (results.length >= MAX_ANSWERS) return;
+          }
+        }
+      }
+    }
+
+    rec(init);
+    return results;
+  }
+
+  /* =========================================================
+   * 玩家表达式解析 + 校验（不用 eval）
+   * - 将玩家输入中的字母 A/J/Q/K 当作牌面值来匹配手牌（A=1, J=Q=K=10）
+   * - 用 shunting-yard 转 RPN 后求值
+   * - 验证：
+   *   1) 表达式合法且结果 == 24（容差）
+   *   2) 数字 token 恰好覆盖四张手牌
+   * ========================================================= */
+  const CARD_ALIAS = {
+    'A': 1, 'a': 1,
+    'J': 10, 'j': 10,
+    'Q': 10, 'q': 10,
+    'K': 10, 'k': 10,
+  };
+
+  function normalizeExpr(input) {
+    // 全角 / 中文符号归一化
+    return String(input || '')
+      .replace(/×/g, '*').replace(/×/g, '*')
+      .replace(/÷/g, '/')
+      .replace(/（/g, '(').replace(/）/g, ')')
+      .replace(/＋/g, '+').replace(/－/g, '-').replace(/−/g, '-')
+      .replace(/\s+/g, '');
+  }
+
+  /* tokenize —— 返回 [{type:'num'|'op'|'lparen'|'rparen', value}] */
+  function tokenize(expr) {
+    const tokens = [];
+    let i = 0;
+    while (i < expr.length) {
+      const c = expr[i];
+      if ((c >= '0' && c <= '9') || c === '.') {
+        let j = i;
+        while (j < expr.length && ((expr[j] >= '0' && expr[j] <= '9') || expr[j] === '.')) j++;
+        const numStr = expr.slice(i, j);
+        const v = parseFloat(numStr);
+        if (isNaN(v)) throw new Error('数字无效：' + numStr);
+        tokens.push({ type: 'num', value: v, raw: numStr });
+        i = j;
+      } else if (CARD_ALIAS[c] !== undefined) {
+        tokens.push({ type: 'num', value: CARD_ALIAS[c], raw: c.toUpperCase() });
+        i++;
+      } else if ('+-*/'.includes(c)) {
+        tokens.push({ type: 'op', value: c });
+        i++;
+      } else if (c === '(') { tokens.push({ type: 'lparen' }); i++; }
+      else if (c === ')') { tokens.push({ type: 'rparen' }); i++; }
+      else { throw new Error('无法识别的字符：' + c); }
+    }
+    return tokens;
+  }
+
+  function shuntingYard(tokens) {
+    const prec = { '+': 1, '-': 1, '*': 2, '/': 2 };
+    const out = [];
+    const ops = [];
+    for (const t of tokens) {
+      if (t.type === 'num') out.push(t);
+      else if (t.type === 'op') {
+        while (ops.length) {
+          const top = ops[ops.length - 1];
+          if (top.type === 'op' && prec[top.value] >= prec[t.value]) out.push(ops.pop());
+          else break;
+        }
+        ops.push(t);
+      } else if (t.type === 'lparen') ops.push(t);
+      else if (t.type === 'rparen') {
+        while (ops.length && ops[ops.length - 1].type !== 'lparen') out.push(ops.pop());
+        if (!ops.length) throw new Error('括号不匹配');
+        ops.pop(); // 弹出左括号
+      }
+    }
+    while (ops.length) {
+      const top = ops.pop();
+      if (top.type !== 'op') throw new Error('括号不匹配');
+      out.push(top);
+    }
+    return out;
+  }
+
+  function evalRPN(rpn) {
+    const stack = [];
+    for (const t of rpn) {
+      if (t.type === 'num') stack.push(t.value);
+      else {
+        if (stack.length < 2) throw new Error('表达式不完整');
+        const b = stack.pop(), a = stack.pop();
+        let v;
+        switch (t.value) {
+          case '+': v = a + b; break;
+          case '-': v = a - b; break;
+          case '*': v = a * b; break;
+          case '/':
+            if (b === 0) throw new Error('除数不能为 0');
+            v = a / b; break;
+        }
+        stack.push(v);
+      }
+    }
+    if (stack.length !== 1) throw new Error('表达式不完整');
+    return stack[0];
+  }
+
+  /* 返回 null 表示通过；否则返回提示字符串 */
+  function checkCards(tokens, cards) {
+    const usedVals = tokens.filter(t => t.type === 'num').map(t => t.value);
+    const handVals = cards.map(c => c.value);
+    const handDesc = cards.map(c => c.label + c.suit).join(' ');
+
+    if (usedVals.length !== cards.length) {
+      return `需要用到恰好 <b>${cards.length}</b> 张手牌，但你的算式里出现了 <b>${usedVals.length}</b> 个数字。发下的是：${handDesc}。`;
+    }
+    const handSorted = handVals.slice().sort((a, b) => a - b);
+    const usedSorted = usedVals.slice().sort((a, b) => a - b);
+    for (let i = 0; i < handSorted.length; i++) {
+      if (handSorted[i] !== usedSorted[i]) {
+        return `算式里的数字和发下的牌对不上。发下的是：${handDesc}。`;
+      }
+    }
+    return null;
+  }
+
+  /* 主入口 */
+  function validatePlayerExpr(rawInput, cards, target) {
+    target = target || 24;
+    const out = { ok: false, value: null, reason: '' };
+    try {
+      const expr = normalizeExpr(rawInput);
+      if (!expr) { out.reason = '请输入算式'; return out; }
+      const tokens = tokenize(expr);
+      if (!tokens.some(t => t.type === 'op')) { out.reason = '请至少使用一个运算符'; return out; }
+      const rpn = shuntingYard(tokens);
+      const val = evalRPN(rpn);
+
+      const cardErr = checkCards(tokens, cards);
+      if (cardErr) { out.reason = cardErr; return out; }
+
+      out.value = val;
+      if (Math.abs(val - target) < 1e-6) {
+        out.ok = true;
+        out.reason = '完美！';
+      } else {
+        out.reason = '结果是 ' + (Math.round(val * 1e6) / 1e6) + '，不是 ' + target + '。';
+      }
+    } catch (e) {
+      out.reason = e.message || '表达式无法解析';
+    }
+    return out;
+  }
+
+  global.Solver24 = {
+    solve: solve24,
+    validate: validatePlayerExpr,
+    normalizeExpr: normalizeExpr,
+    tokenize: tokenize,
+  };
+
+})(window);
+</script>
+
+<script>
+/* =========================================================
+ * game.js —— 发牌、渲染、交互、计分
+ * ========================================================= */
+(function () {
+  'use strict';
+
+  const SUITS = [
+    { code: '♠', name: 'spades',   color: 'black' },
+    { code: '♥', name: 'hearts',   color: 'red'   },
+    { code: '♦', name: 'diamonds', color: 'red'   },
+    { code: '♣', name: 'clubs',    color: 'black' },
+  ];
+
+  // 构造整副 52 张
+  function buildDeck() {
+    const deck = [];
+    const ranks = [
+      { label: 'A', value: 1 },
+      { label: '2', value: 2 },
+      { label: '3', value: 3 },
+      { label: '4', value: 4 },
+      { label: '5', value: 5 },
+      { label: '6', value: 6 },
+      { label: '7', value: 7 },
+      { label: '8', value: 8 },
+      { label: '9', value: 9 },
+      { label: '10', value: 10 },
+      { label: 'J', value: 10 },
+      { label: 'Q', value: 10 },
+      { label: 'K', value: 10 },
+    ];
+    for (const s of SUITS) {
+      for (const r of ranks) {
+        deck.push({
+          label: r.label,
+          value: r.value,
+          suit: s.code,
+          suitName: s.name,
+          color: s.color,
+        });
+      }
+    }
+    return deck;
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  /* ============ DOM ============ */
+  const $cards    = document.getElementById('cards');
+  const $expr     = document.getElementById('expr');
+  const $msg      = document.getElementById('msg');
+  const $streak   = document.getElementById('streak');
+  const $wins     = document.getElementById('wins');
+  const $losses   = document.getElementById('losses');
+  const $hints    = document.getElementById('hints');
+  const $modal    = document.getElementById('modal');
+  const $mTitle   = document.getElementById('modal-title');
+  const $mBody    = document.getElementById('modal-body');
+
+  /* ============ 渲染扑克 ============ */
+  function renderCard(card, idx) {
+    const div = document.createElement('div');
+    div.className = 'card' + (card.color === 'red' ? ' red' : '');
+    div.style.animationDelay = (idx * 0.08) + 's';
+    const isFace = ['J', 'Q', 'K'].includes(card.label);
+
+    let jqkLabel = '';
+    if (isFace) jqkLabel = card.label;
+
+    div.innerHTML = `
+      <div class="corner tl">
+        <span class="rank">${card.label}</span>
+        <span class="suit">${card.suit}</span>
+      </div>
+      <div class="pip ${isFace ? 'jqk' : ''}" ${isFace ? `data-label="${jqkLabel}"` : ''}>
+        ${isFace ? '' : card.suit.repeat(card.label === '10' ? 2 : 1)}
+      </div>
+      <div class="corner br">
+        <span class="rank">${card.label}</span>
+        <span class="suit">${card.suit}</span>
+      </div>
+    `;
+    return div;
+  }
+
+  function renderBack() {
+    const div = document.createElement('div');
+    div.className = 'card back';
+    return div;
+  }
+
+  /* ============ 状态 ============ */
+  const SAVE_KEY = 'game24.stats.v1';
+  let stats = loadStats();
+  let currentCards = [];
+  let currentSolutions = [];
+  let lastAnswerUsed = false;
+  let hintUsedThisRound = false;
+  let answeredThisRound = false;
+
+  function loadStats() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return { wins: 0, losses: 0, streak: 0, hints: 0 };
+  }
+  function saveStats() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(stats)); } catch (e) {}
+  }
+  function renderStats() {
+    $streak.textContent = stats.streak || 0;
+    $wins.textContent   = stats.wins   || 0;
+    $losses.textContent = stats.losses || 0;
+    $hints.textContent  = stats.hints  || 0;
+  }
+
+  /* ============ 发牌 ============ */
+  function deal() {
+    currentCards = [];
+    currentSolutions = [];
+    answeredThisRound = false;
+    hintUsedThisRound = false;
+    lastAnswerUsed = false;
+    setMsg('', '');
+    $expr.value = '';
+    $expr.classList.remove('error');
+
+    // 先铺四张背面朝上，给个"洗牌节奏"
+    $cards.innerHTML = '';
+    for (let i = 0; i < 4; i++) $cards.appendChild(renderBack());
+
+    // 抽牌，优先抽"有解"的一手（至少尝试若干次）
+    setTimeout(() => {
+      const deck = shuffle(buildDeck());
+      let picks, sols;
+      const MAX_TRIES = 200;
+      let tries = 0;
+      do {
+        picks = deck.slice(0, 4);
+        sols = window.Solver24.solve(picks, { maxAnswers: 50 });
+        tries++;
+      } while (sols.length === 0 && tries < MAX_TRIES);
+      // 允许偶尔出无解的牌（让玩家体验"无解"的情况）
+      currentCards = picks;
+      currentSolutions = sols;
+
+      // 重新渲染正面
+      $cards.innerHTML = '';
+      currentCards.forEach((c, i) => $cards.appendChild(renderCard(c, i)));
+
+      if (currentSolutions.length === 0) {
+        setMsg('⚠️ 这一手牌经计算 <b>无解</b>，建议点「换一手」。', 'info');
+      } else {
+        setMsg(`手牌已发出，共找到 ${currentSolutions.length} 种解法，试试看！`, 'info');
+      }
+    }, 350);
+  }
+
+  /* ============ 提交校验 ============ */
+  function onCheck() {
+    if (!currentCards.length) { setMsg('还没发牌呢～', 'err'); return; }
+    const input = $expr.value.trim();
+    const res = window.Solver24.validate(input, currentCards, 24);
+    $expr.classList.toggle('error', !res.ok);
+    if (res.ok) {
+      setMsg('✅ ' + input + ' = 24', 'ok');
+      stats.wins++;
+      stats.streak++;
+      // 如果没看答案也没要提示，连胜有效，并且额外加分的感觉就保留在 streak
+      renderStats();
+      saveStats();
+      showModal({
+        title: '🎉 太棒了！',
+        body: `算式 <code>${input}</code> = 24 完全正确！` +
+              `连胜 <b>${stats.streak}</b>。再来一手？`,
+      });
+      answeredThisRound = true;
+    } else {
+      setMsg('❌ ' + res.reason, 'err');
+    }
+  }
+
+  /* ============ 提示 ============ */
+  function onHint() {
+    if (!currentCards.length) { setMsg('还没发牌呢～', 'err'); return; }
+    if (currentSolutions.length === 0) {
+      setMsg('这手牌真的无解，没法给提示 😅', 'info');
+      return;
+    }
+    const ans = currentSolutions[0].expr;
+    // 轻量提示：前两步合并的目标
+    // 先给一个数字开头（不透露完整解法）
+    const hint = makeHint(currentCards, currentSolutions);
+    hintUsedThisRound = true;
+    stats.hints = (stats.hints || 0) + 1;
+    renderStats();
+    saveStats();
+    setMsg('💡 ' + hint, 'info');
+  }
+
+  function makeHint(cards, sols) {
+    // 从解里抽取一个提示：先告诉你能先把哪两张合起来
+    const expr = sols[0].expr;
+    return `试试凑出接近中间值的数（例如先看相邻两张能否得到 8、3、6 之类的关键因子）。答案之一：<code>${expr.split(' ')[0]} ...</code>（点击「看答案」查看完整解法）`;
+  }
+
+  /* ============ 看答案 ============ */
+  function onAnswer() {
+    if (!currentCards.length) { setMsg('还没发牌呢～', 'err'); return; }
+    lastAnswerUsed = true;
+    if (currentSolutions.length === 0) {
+      setMsg('😔 这手牌 <b>无解</b>（暴力枚举所有可能都算不出 24）。', 'info');
+      return;
+    }
+    const top3 = currentSolutions.slice(0, 3).map(s => '<li><code>' + s.expr + '</code></li>').join('');
+    setMsg(`🧠 找到 ${currentSolutions.length} 种解法，列举 3 个：<ul style="margin:6px 0 0 16px;color:#fff;"><code>${top3}</code></ul>`, 'info');
+    showModal({
+      title: '答案',
+      body: `这手牌一共有 <b>${currentSolutions.length}</b> 种解法，随便挑一个：<br><code>${currentSolutions[0].expr}</code>`,
+    });
+  }
+
+  /* ============ 重置 ============ */
+  function onReset() {
+    if (!confirm('确定要清零战绩吗？')) return;
+    stats = { wins: 0, losses: 0, streak: 0, hints: 0 };
+    saveStats();
+    renderStats();
+    setMsg('战绩已清零。', 'info');
+  }
+
+  /* ============ 提示条 ============ */
+  function setMsg(text, cls) {
+    $msg.className = 'msg' + (cls ? ' ' + cls : '');
+    $msg.innerHTML = text;
+  }
+
+  function showModal({ title, body }) {
+    $mTitle.textContent = title;
+    $mBody.innerHTML = body;
+    $modal.classList.remove('hidden');
+  }
+  function hideModal() { $modal.classList.add('hidden'); }
+
+  /* ============ 虚拟键盘 ============ */
+  function wireKeyboard() {
+    document.querySelectorAll('.kbd').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = btn.dataset.val;
+        if (v === 'back') {
+          $expr.value = $expr.value.slice(0, -1);
+        } else {
+          $expr.value += v;
+        }
+        $expr.focus();
+      });
+    });
+  }
+
+  /* ============ 语音输入 ============ */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  const CN_DIGIT = {
+    '零': 0, '〇': 0, '一': 1, '壹': 1, '二': 2, '两': 2, '贰': 2,
+    '三': 3, '叁': 3, '四': 4, '肆': 4, '五': 5, '伍': 5,
+    '六': 6, '陆': 6, '七': 7, '柒': 7, '八': 8, '捌': 8, '九': 9, '玖': 9,
+  };
+  const CN_UNIT = { '十': 10, '拾': 10, '百': 100, '佰': 100 };
+
+  function cnNumeralToNumber(buf) {
+    // 逐位念法：一零 → 10、三四 → 34
+    if (!/[十拾百佰]/.test(buf)) {
+      return Array.from(buf).map(c => CN_DIGIT[c]).join('');
+    }
+    // 按位值念法：十 → 10、二十三 → 23
+    let total = 0, cur = 0;
+    for (const c of buf) {
+      if (CN_UNIT[c]) { total += (cur || 1) * CN_UNIT[c]; cur = 0; }
+      else cur = CN_DIGIT[c];
+    }
+    return String(total + cur);
+  }
+
+  // 把口述的中文算式转成可解析的算式字符串
+  function spokenToExpr(text) {
+    let s = String(text || '');
+    const words = [
+      ['乘以', '*'], ['乘上', '*'], ['乘', '*'],
+      ['除以', '/'], ['除', '/'],
+      ['加上', '+'], ['加', '+'],
+      ['减去', '-'], ['减', '-'],
+      ['左括号', '('], ['左括弧', '('], ['前括号', '('], ['开括号', '('],
+      ['右括号', ')'], ['右括弧', ')'], ['后括号', ')'], ['反括号', ')'], ['闭括号', ')'],
+      ['等于多少', ''], ['等于', ''],
+    ];
+    for (const [from, to] of words) s = s.split(from).join(to);
+
+    // 只说「括号」时按当前括号深度判断是左括号还是右括号
+    let balanced = '', depth = 0, k = 0;
+    while (k < s.length) {
+      if (s.startsWith('括号', k) || s.startsWith('括弧', k)) {
+        if (depth > 0) { balanced += ')'; depth--; } else { balanced += '('; depth++; }
+        k += 2;
+      } else {
+        const ch = s[k];
+        if (ch === '(') depth++;
+        else if (ch === ')') depth = Math.max(0, depth - 1);
+        balanced += ch;
+        k++;
+      }
+    }
+    s = balanced;
+
+    // 小数点：三点五 → 3.5
+    const D = '[0-9零〇一壹二两贰三叁四肆五伍六陆七柒八捌九玖]';
+    s = s.replace(new RegExp('(' + D + ')点(' + D + ')', 'g'), '$1.$2');
+    s = s.replace(/[的了吗呢吧啊嘛，,。．、!！?？：:；;\s]/g, '');
+
+    // 中文数字 → 阿拉伯数字
+    let out = '', i = 0;
+    while (i < s.length) {
+      const c = s[i];
+      if (CN_DIGIT[c] !== undefined || CN_UNIT[c] !== undefined) {
+        let j = i, buf = '';
+        while (j < s.length && (CN_DIGIT[s[j]] !== undefined || CN_UNIT[s[j]] !== undefined)) { buf += s[j]; j++; }
+        out += cnNumeralToNumber(buf);
+        i = j;
+      } else { out += c; i++; }
+    }
+    // 只保留算式中合法的字符
+    out = out.replace(/[^0-9A-Za-z+\-*/().]/g, '');
+
+    // 补齐缺失的右括号（口语常省略结尾的「右括号」）
+    let open = 0;
+    for (const ch of out) {
+      if (ch === '(') open++;
+      else if (ch === ')') open = Math.max(0, open - 1);
+    }
+    if (open > 0) out += ')'.repeat(open);
+
+    return out;
+  }
+
+  let recog = null;
+
+  function setListening(on) {
+    const btn = document.getElementById('btn-voice');
+    if (!btn) return;
+    btn.classList.toggle('listening', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.title = on ? '正在聆听…（再点一次停止）' : '语音输入算式';
+  }
+
+  function applyVoiceResult(texts) {
+    const cands = texts.map(t => spokenToExpr(t)).filter(t => t && /\d/.test(t));
+    if (!cands.length) { setMsg('🎤 没听清，再试一次？', 'err'); return; }
+
+    // 优先挑一个能算出 24 的候选，其次用第一个
+    let chosen = null;
+    for (const c of cands) {
+      if (window.Solver24.validate(c, currentCards, 24).ok) { chosen = c; break; }
+    }
+    if (!chosen) chosen = cands[0];
+
+    $expr.value = chosen;
+    $expr.focus();
+    if (window.Solver24.validate(chosen, currentCards, 24).ok) {
+      setMsg('🎤 识别到 <code>' + chosen + '</code> = 24，点「提交」确认 ✓', 'ok');
+    } else {
+      setMsg('🎤 识别到 <code>' + chosen + '</code>，请核对后点「提交」', 'info');
+    }
+  }
+
+  function startVoice() {
+    if (!SR) {
+      setMsg('🎤 当前浏览器不支持语音识别，请用 Chrome / Edge / Safari 打开本页。', 'err');
+      return;
+    }
+    // 再点一次 = 停止聆听
+    if (recog) { try { recog.stop(); } catch (e) {} return; }
+
+    const r = new SR();
+    recog = r;
+    r.lang = 'zh-CN';
+    r.interimResults = true;
+    r.continuous = false;
+    r.maxAlternatives = 5;
+
+    let finals = [];
+
+    r.onstart = () => {
+      setListening(true);
+      setMsg('🎤 正在聆听…请念出算式，例如「三加三乘以五减一」', 'info');
+    };
+
+    r.onresult = (e) => {
+      let interim = '', gotFinal = false;
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const res = e.results[i];
+        if (res.isFinal) {
+          gotFinal = true;
+          for (let k = 0; k < res.length; k++) finals.push(res[k].transcript);
+        } else {
+          interim += res[0].transcript;
+        }
+      }
+      if (interim) $expr.value = spokenToExpr(interim);
+      if (gotFinal && finals.length) {
+        const texts = finals.slice();
+        finals = [];
+        applyVoiceResult(texts);
+      }
+    };
+
+    r.onerror = (e) => {
+      const map = {
+        'not-allowed': '麦克风权限被拒绝，请点击地址栏的麦克风图标允许后重试。',
+        'service-not-allowed': '语音服务不可用：需要 HTTPS 页面（或 localhost）并使用 Chrome / Edge / Safari。',
+        'no-speech': '没有听到声音，再点一次麦克风试试。',
+        'audio-capture': '没有检测到麦克风设备。',
+        'network': '语音识别服务连接失败，请检查网络。',
+        'aborted': '已停止聆听。',
+      };
+      setMsg('🎤 ' + (map[e.error] || ('识别出错：' + e.error)), 'err');
+    };
+
+    r.onend = () => {
+      setListening(false);
+      recog = null;
+      if (finals.length) { const texts = finals.slice(); finals = []; applyVoiceResult(texts); }
+    };
+
+    try {
+      r.start();
+    } catch (err) {
+      recog = null;
+      setListening(false);
+      setMsg('🎤 无法启动语音识别：' + err.message, 'err');
+    }
+  }
+
+  /* ============ 事件绑定 ============ */
+  function bind() {
+    document.getElementById('btn-deal').addEventListener('click', deal);
+    document.getElementById('btn-check').addEventListener('click', onCheck);
+    document.getElementById('btn-voice').addEventListener('click', startVoice);
+    document.getElementById('btn-hint').addEventListener('click', onHint);
+    document.getElementById('btn-answer').addEventListener('click', onAnswer);
+    document.getElementById('btn-reset').addEventListener('click', onReset);
+    document.getElementById('modal-next').addEventListener('click', () => { hideModal(); deal(); });
+    document.getElementById('modal-close').addEventListener('click', hideModal);
+    $modal.addEventListener('click', (e) => { if (e.target === $modal) hideModal(); });
+
+    $expr.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') onCheck();
+    });
+    wireKeyboard();
+  }
+
+  /* ============ 启动 ============ */
+  function init() {
+    renderStats();
+    bind();
+    if (!SR) {
+      const btn = document.getElementById('btn-voice');
+      if (btn) { btn.classList.add('unsupported'); btn.title = '当前浏览器不支持语音识别'; }
+    }
+    deal();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+</script>
+</body>
+</html>
