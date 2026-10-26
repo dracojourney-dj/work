@@ -27,6 +27,7 @@
       <label for="expr">输入你的算式</label>
       <div class="expr-row">
         <input id="expr" type="text" placeholder="例如 (3+3)*(5-1) 或 10*2+8-4" autocomplete="off" spellcheck="false" />
+        <button id="btn-voice" class="voice" title="语音输入算式" aria-label="语音输入算式" aria-pressed="false">🎤</button>
         <button id="btn-check" class="primary">提交</button>
       </div>
       <div class="kbd-row" id="kbd-row">
@@ -56,6 +57,7 @@
           <li>支持小数中间结果，例如 <code>3÷(1−5÷6)=24</code>。</li>
           <li>若一手牌无解，点「换一手」即可；或按「看答案」查看（无解会提示）。</li>
           <li>输入中请使用 <code>*</code> 表示乘，<code>/</code> 表示除。</li>
+          <li>🎤 语音输入：点麦克风后直接念算式，如「三加三乘以五减一」，会自动转成 <code>(3+3)*(5-1)</code>。需要 Chrome / Edge / Safari 并允许麦克风权限。</li>
         </ul>
       </details>
     </section>
